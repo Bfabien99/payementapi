@@ -2,16 +2,20 @@
 
 namespace App\Controller;
 
+use Exception;
+use App\Service\JWT;
 use App\Entity\Customers;
 use App\Entity\Transaction;
 use App\Repository\CustomersRepository;
-use App\Service\JWT;
 use Doctrine\Persistence\ManagerRegistry;
-use Exception;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 
 #[Route('/api', name: 'app.api')]
 class ApiController extends AbstractController
@@ -193,9 +197,13 @@ class ApiController extends AbstractController
     #[Route('/account/transaction/{id}', name: 'app.api.usertransaction', methods: ['GET'])]
     public function getUserTransaction($id){
         $transactions = $this->manager->getRepository(Transaction::class)->findBy(["sender_id" => $id]);
-
+        
         return $this->json([
             'success' => $transactions
+        ],Response::HTTP_OK, [],[
+            ObjectNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($object){
+                return $object->getId();
+            }
         ]);
     }
 

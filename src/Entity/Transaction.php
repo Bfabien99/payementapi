@@ -126,7 +126,6 @@ class Transaction
 
     public function returnArray(){
         $arrayCustomer = [
-            "customer_id" => $this->getSenderId(),
             "receiver_phone" => $this->getReceiverPhone(),
             "type" => $this->getType(),
             "amount" => $this->getAmount(),
